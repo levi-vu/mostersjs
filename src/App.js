@@ -4,6 +4,7 @@ import { Component } from "react";
 import React from "react";
 
 import * as _ from "lodash";
+import CardList from "./components/card-list/card-list.component";
 
 class App extends Component {
   constructor() {
@@ -11,7 +12,6 @@ class App extends Component {
     this.state = {
       monsters: [],
       searchString: '',
-      originMonster: []
     };
   }
 
@@ -21,27 +21,19 @@ class App extends Component {
     .then(res => res.json())
     .then(data => this.setState({ monsters: data, originMonster: data }));
   }
+
+
+  onSearchChange = (event) =>{
+    const searchString = event.target.value.toLowerCase();
+    this.setState({searchString})
+  }
   
   render() {
+    const filteredMonsters = _.filter(this.state.monsters, item =>  _.includes(item.name.toLowerCase(), this.state.searchString));
     return (
       <div className="App">
-      <input  type="search" placeholder="search monsters" onChange={(event) => {
-        const lowerKey = event.target.value.toLowerCase();
-        this.setState(state => {
-          return {
-            monsters : _.filter(state.originMonster, item =>  _.includes(item.name.toLowerCase(), lowerKey))
-          }
-      
-        }, () => {
-          console.log(this.state.monsters);
-        })
-      }}/>
-        {
-          this.state.monsters.map((monster) => 
-          <div key={monster.id}>
-            <h1>{monster.name}</h1>
-            </div>)
-        }
+      <input  type="search" placeholder="search monsters" onChange={this.onSearchChange}/>
+      <CardList  monsters= {filteredMonsters} />
       </div>
     );
   }
